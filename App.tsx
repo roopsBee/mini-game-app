@@ -1,24 +1,110 @@
 import { StatusBar } from "expo-status-bar"
-import React, { useState } from "react"
-import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native"
+import React, { useReducer, useState } from "react"
+import {
+  Button,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from "react-native"
+
+type StateType = {
+  targetNumber: number
+  isModalOpen: boolean
+  highNumber: number
+  lowNumber: number
+  guessedNumbers: number[]
+  isWinner: boolean
+}
+
+type GuessNumberAction = {
+  type: "guessNumber"
+  payload?: null
+}
+type ToggleModalAction = {
+  type: "toggleModal"
+  payload: boolean
+}
+type SetNumberAction = {
+  type: "setNumber"
+  payload: number
+}
+
+type SetLowHigh = {
+  type: "setLowHigh"
+  payload: { low?: number; high?: number }
+}
+
+type CheckWinnerAction = {
+  type: "checkWinner"
+  payload?: null
+}
+
+type ActionTypes =
+  | GuessNumberAction
+  | ToggleModalAction
+  | SetNumberAction
+  | SetLowHigh
+  | CheckWinnerAction
+
+const initialState: StateType = {
+  targetNumber: 0,
+  isModalOpen: false,
+  highNumber: 99,
+  lowNumber: 0,
+  guessedNumbers: [],
+  isWinner: false
+}
 
 export default function App() {
-  const [number, setNumber] = useState(0)
-  const [ismodalOpen, setIsmodalOpen] = useState(false)
-  const [highNumber, setHighNumber] = useState(99)
-  const [lowNumber, setLowNumber] = useState(0)
+  const [{ targetNumber, isModalOpen, guessedNumbers }, dispatch] = useReducer(
+    (state: StateType, { type, payload }: ActionTypes): StateType => {
+      const { lowNumber, highNumber, guessedNumbers, isWinner } = state
+      switch (type) {
+        case "guessNumber":
+          const guessedNumber = Math.floor(
+            Math.random() * (highNumber - lowNumber + 1) + lowNumber
+          )
+          return {
+            ...state,
+            guessedNumbers: [guessedNumber, ...guessedNumbers]
+          }
+        case "toggleModal":
+          return { ...state, isModalOpen: payload }
+        case "setNumber":
+          return { ...state, targetNumber: payload }
+        case "setLowHigh":
+          const low = payload.low || lowNumber
+          const high = payload.high || highNumber
+          return { ...state, lowNumber: low, highNumber: high }
+        case "checkWinner":
+          if (guessedNumbers[0] === targetNumber) {
+            return { ...state, isWinner: true }
+          } else {
+            return { ...state }
+          }
+        default:
+          return state
+      }
+    },
+    initialState
+  )
 
   const handleSubmitNumber = () => {
-    console.log(number)
-    setIsmodalOpen(true)
+    dispatch({ type: "guessNumber" })
+    dispatch({ type: "toggleModal", payload: true })
   }
 
-  const handleNumberIsHigher = () => {}
+  const handleNumberIsHigher = () => {
+    dispatch({ type: "setLowHigh", payload: { low: guessedNumbers[0] } })
+    dispatch({ type: "guessNumber" })
+  }
 
-  const handleNumberIsLower = () => {}
-
-  const guessNumber = (min: number, max: number) => {
-    return Math.floor(Math.random() * (max - min + 1) + min)
+  const handleNumberIsLower = () => {
+    dispatch({ type: "setLowHigh", payload: { high: guessedNumbers[0] } })
+    dispatch({ type: "guessNumber" })
   }
 
   return (
@@ -30,17 +116,27 @@ export default function App() {
           keyboardType="numeric"
           placeholder="Enter number"
           maxLength={2}
-          value={number.toString()}
+          value={targetNumber.toString()}
           onChangeText={(text) => {
-            setNumber(Number(text))
+            dispatch({ type: "setNumber", payload: Number(text) })
           }}
         />
         <Button title="Go" onPress={handleSubmitNumber} />
-        <Modal visible={ismodalOpen} animationType="slide">
-          <Text>Modal</Text>
+        <Modal visible={isModalOpen} animationType="slide">
           <View>
-            <Text>My number: {number}</Text>
-            <Text>Guessed number: </Text>
+            <Text>My number: {targetNumber}</Text>
+            <Text>Guessed number: {guessedNumbers[0]} </Text>
+            <Pressable
+              style={styles.hiLowButtons}
+              android_ripple={{ color: "#f05" }}
+              onPress={handleNumberIsHigher}
+            >
+              <Text style={styles.hiLowButtonsText}>Higher</Text>
+            </Pressable>
+            <Button title="lower" onPress={handleNumberIsLower} />
+            {guessedNumbers.slice(1).map((guess, i) => {
+              return <Text key={i}>Guess: {guess}</Text>
+            })}
           </View>
         </Modal>
       </View>
@@ -54,5 +150,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center"
+  },
+  hiLowButtons: {
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f"
+  },
+  hiLowButtonsText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "700",
+    textTransform: "uppercase"
   }
 })
