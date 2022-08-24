@@ -3,6 +3,7 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
+    "": { type: "" };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {};
@@ -13,12 +14,13 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
+    computerGuess: "selectHigher" | "selectLower";
     resetState: "restartGame" | "xstate.init";
   };
   eventsCausingServices: {};
   eventsCausingGuards: {
-    correct: "computerGuess";
-    guessAgain: "computerGuess";
+    "correct guess": "";
+    "incorrect guess": "";
   };
   eventsCausingDelays: {};
   matchesStates:

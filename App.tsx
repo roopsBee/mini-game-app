@@ -53,11 +53,12 @@ const initialState: StateType = {
 }
 
 const gameMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0qGAymAC4CuADgMQkDuA4umIqAwPawCNAnyI8QAD0QBaAIwBWAGykAnAAYAHABYNAJg0qAzLvlaA7IoA0IAJ4zDh0scOLDB2YrULF8gL6-rCixcQhJSNBsAFToAJyImWDAAGzAcGgAJAig8MBjxfkFhUXEpBENTUl1dF1cHNTUzDWs7BDVVKsNZM10zFwM1TpV-QK5sfGIyCOi4hOTUmgAZPlZc-IEhETEkSUQTFVJ6+QalfVkG2S1mxDONSq15U1l+rUUq4ZAgsdCyHD40BhouWm8V+-zogJi7DocHg2wKG2K21Kcl0bXkCjU8mM8jMZhUuN0VwQ+i0qk8ihUqI0jTUKgU70+IQm5C4AFEiBAmDE4DQUDEaJwMGtCpsSvYsZUVCpFLIej50SolESzrpSEpDBZKbotHS9IYGaMmWFEik0pE+TAaAA5OhoABGuQSdDtaCENvtqzh6yKW1AyLMpC0WjUPXkofk1IGROknnaFka8ilR10slk-gCICIfAgcHEjPGYSC1HoDGFCN9OwQ0jcbS0+jMmNlPgahmj3VICnuhjpmjlbgNGC+zKmsQr8J9YoQXVJFPuj20daqVlsMkTTlM6LU9yemllfgz+e+pFBAKBo7LE6RiEMwacWguqO6PUMXmXLRTqrOdIeshv3VlA7BAWZBBOyEAXqKV5VsYygaMYWg3tuKj3q2K7EveHY6q86gXHSZyKIBQ7GnMZoWrQ7oOnkXoioifoyBcshqpG+IeHiijUvIRJmIxjQ6PeeiKC8uL7iMg5Gtw1HlpO0jBqSdaRuiujNr00YXKSsrGNKryPlo6a+EAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0qGAymAC4CuADgMQkDuA4umIqAwPawCNAnyI8QAD0QBaAGykAHAFZZSpQE4AzJoUB2XQCZN69QBoQATxkAWBaU0BGWY+tLdABlm6HBpQF8-cwosXEISUjQLABU6ACciJlgwABswHBoACQIoPDBY8X5BYVFxKQQld2tSA101BVkFBVdZd01dcysEaQcq9w9NJQUdd3VZVS8AoK5sfGIySJj4xJS0mgAZPlY8goEhETEkSURrEdJ3FRN1BwVfBXUlDsQtaqUDetkjQc9ZB0mQYJmYTIOD4aAYNDyiwSOyK+1KiCUpGcSmstVkJzGPnUCkeCE07gMihUPV01hJvnUfwBoTm5C4AFEiBAmLE4DQULEaJwMDC9iVDmVpAZWtVUQ11AYHA5WoZcXpSG5pVo3ASPs4qdMaeEkql0lEOTAaAA5OhoABGeUSdDNaCEJvN20OhT5B1AZQcmiqN0M1jeyla93alhkPiqhlajQchiMxl0AUCICIfAgcHE1Nm4WC1HoDF5xVdRy6Rnc9l0XgUDjcwoM1gluOk8vJJI+Wgc2I1GEBtIWcQLzvz8LxNdIpPR+l0OnUlVk9dJ9lR1x+nmszkMHZCGeBoPBkN7ebhAuOp2Uukaxk0LQ0OODCBODiRqhVY7bFes667mYZTP3-LdIbLI4KOc0p3KSgz3LiBgGPIlayPc2gtL4KJvgm6ZAqQOqrPqsSGvaFr5E6uwDoeCB2CutjQToqgei0QadCoI4Sk4PzeBWkoqO+WrcIRsK-oWQooqW5aVuGNZ1je3SjEidyVp6JzKFOmjxn4QA */
   createMachine(
     {
-      predictableActionArguments: true,
+      context: { computerGuesses: [] as number[] },
       tsTypes: {} as import("./App.typegen").Typegen0,
+      predictableActionArguments: true,
       id: "gameMachine",
       initial: "gameSetup",
       states: {
@@ -80,18 +81,17 @@ const gameMachine =
           }
         },
         compterTurn: {
-          on: {
-            computerGuess: [
-              {
-                cond: "correct",
-                target: "gameEnd"
-              },
-              {
-                cond: "guessAgain",
-                target: "myTurn"
-              }
-            ]
-          }
+          entry: "computerGuess",
+          always: [
+            {
+              cond: "correct guess",
+              target: "gameEnd"
+            },
+            {
+              cond: "incorrect guess",
+              target: "myTurn"
+            }
+          ]
         },
         gameEnd: {
           on: {
@@ -113,13 +113,14 @@ const gameMachine =
       actions: {
         resetState: () => {
           console.log("state is reset")
-        }
+        },
+        computerGuess(context, event, meta) {}
       },
       guards: {
-        correct: () => {
+        "correct guess": () => {
           return true
         },
-        guessAgain: () => true
+        "incorrect guess": () => true
       }
     }
   )
