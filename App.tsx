@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar"
 import React, { useReducer } from "react"
-import { createMachine } from "xstate"
+import { assign, createMachine } from "xstate"
 import {
   Button,
   Modal,
@@ -14,96 +14,80 @@ import { useMachine } from "@xstate/react"
 
 type StateType = {
   targetNumber: number
-  isModalOpen: boolean
-  highNumber: number
-  lowNumber: number
+  isGameModalOpen: boolean
+  guessRange: {
+    highNumber: number
+    lowNumber: number
+  }
   guessedNumbers: number[]
   isWinner: boolean
 }
 
-type ActionTypes =
-  | {
-      type: "guessNumber"
-      payload?: null
-    }
-  | {
-      type: "toggleModal"
-      payload: boolean
-    }
-  | {
-      type: "setNumber"
-      payload: number
-    }
-  | {
-      type: "setLowHigh"
-      payload: { low?: number; high?: number }
-    }
-  | {
-      type: "checkWinner"
-      payload?: null
-    }
+type MachineEvents =
+  | { type: "typeNumber"; value: number }
+  | { type: "submitNumber" }
+  | { type: "restartGame" }
+  | { type: "selectHighOrLow"; setLow?: number; setHigh?: number }
 
 const initialState: StateType = {
   targetNumber: 0,
-  isModalOpen: false,
-  highNumber: 99,
-  lowNumber: 0,
+  isGameModalOpen: false,
+  guessRange: {
+    highNumber: 99,
+    lowNumber: 0
+  },
   guessedNumbers: [],
   isWinner: false
 }
 
 const gameMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0qGAymAC4CuADgMQkDuA4umIqAwPawCNAnyI8QAD0QBaAGykAHAFZZSpQE4AzJoUB2XQCZN69QBoQATxkAWBaU0BGWY+tLdABlm6HBpQF8-cwosXEISUjQLABU6ACciJlgwABswHBoACQIoPDBY8X5BYVFxKQQld2tSA101BVkFBVdZd01dcysEaQcq9w9NJQUdd3VZVS8AoK5sfGIySJj4xJS0mgAZPlY8goEhETEkSURrEdJ3FRN1BwVfBXUlDsQtaqUDetkjQc9ZB0mQYJmYTIOD4aAYNDyiwSOyK+1KiCUpGcSmstVkJzGPnUCkeCE07gMihUPV01hJvnUfwBoTm5C4AFEiBAmLE4DQULEaJwMDC9iVDmVpAZWtVUQ11AYHA5WoZcXpSG5pVo3ASPs4qdMaeEkql0lEOTAaAA5OhoABGeUSdDNaCEJvN20OhT5B1AZQcmiqN0M1jeyla93alhkPiqhlajQchiMxl0AUCICIfAgcHE1Nm4WC1HoDF5xVdRy6Rnc9l0XgUDjcwoM1gluOk8vJJI+Wgc2I1GEBtIWcQLzvz8LxNdIpPR+l0OnUlVk9dJ9lR1x+nmszkMHZCGeBoPBkN7ebhAuOp2Uukaxk0LQ0OODCBODiRqhVY7bFes667mYZTP3-LdIbLI4KOc0p3KSgz3LiBgGPIlayPc2gtL4KJvgm6ZAqQOqrPqsSGvaFr5E6uwDoeCB2CutjQToqgei0QadCoI4Sk4PzeBWkoqO+WrcIRsK-oWQooqW5aVuGNZ1je3SjEidyVp6JzKFOmjxn4QA */
+  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0aAngCoCuATkQMSxgA2YOALgBIFR4B5OgBkA9gHdEoAA6jYBTgVFEpIAB6IAjAAYAHADZSATgDsu3doCsmowGZdmkwBYANCAqJbAJm2lNur0svJwD9J01LXVsAX2i3VAxsfGIyHFE0aRpOMDpaBkZVWXlFZVUNBE1bPVJbE1tLbTNLfT0otw8EJ31DcK8vfUdLZutbJ1j49CxcQhJSBLAAUSIIRjo4ThQ6TgBxScK5BSUVJHUtZq9SEyMh7SdWxtd3RABaO1JdM0GvE30qk0sTOMQPMkjMyCx2FwqJsYJwAHI0NAAIxyzBoSLQCgRyJy+2KRzKiCM-VIAOatm64QizXaWiuxicliMRhaVlGJi8QJB0xSpAhHE40LosOxKLojE4FGkYFFuJORUOpRO5U0fSMpC8uicfVut2sRkeHWeJlI2lsRn8uiMjW0t3qRlicRARFEEDgqm5yVmlDyxxkBxKftOCGu6t0zQtI2pFNpCG8Jv0Q004XCFLumi5k1BvLSGSyOV9eMVQZVXmJppMVzCxOTLNjVV0fmttmTNh0zjGTs9YLmkyWECLgcJFTJGqslm1LV++i8sZChitVycjK1ziumcSPNm-KhMLA8MRYsHBOViCt6u8SY+9n+TlsseeERqtlGfWCDkrRgCG6mXrAx6VUByg+SwakCaxrxAu8H00RN3i6GtYLCClakdaIgA */
   createMachine(
     {
-      context: { computerGuesses: [] as number[] },
+      context: { ...initialState },
       tsTypes: {} as import("./App.typegen").Typegen0,
+      schema: { context: {} as StateType, events: {} as MachineEvents },
       predictableActionArguments: true,
       id: "gameMachine",
-      initial: "gameSetup",
+      initial: "selectTargetNumber",
       states: {
-        gameSetup: {
-          entry: "resetState",
-          on: {
-            newGame: {
-              target: "selectTargetNumber"
-            }
-          }
-        },
         myTurn: {
           on: {
-            selectHigher: {
-              target: "compterTurn"
-            },
-            selectLower: {
-              target: "compterTurn"
+            selectHighOrLow: {
+              actions: "setNewGuessRange",
+              target: "computerTurn"
             }
           }
         },
-        compterTurn: {
+        computerTurn: {
           entry: "computerGuess",
           always: [
             {
-              cond: "correct guess",
+              cond: "correctGuess",
               target: "gameEnd"
             },
             {
-              cond: "incorrect guess",
               target: "myTurn"
             }
           ]
         },
         gameEnd: {
+          entry: "setWinner",
           on: {
             restartGame: {
-              target: "gameSetup"
+              actions: "resetState",
+              target: "selectTargetNumber"
             }
           }
         },
         selectTargetNumber: {
           on: {
             submitNumber: {
+              actions: ["openGameModal", "computerGuess"],
               target: "myTurn"
+            },
+            typeNumber: {
+              actions: "updateTargetNumber"
             }
           }
         }
@@ -111,70 +95,50 @@ const gameMachine =
     },
     {
       actions: {
-        resetState: () => {
-          console.log("state is reset")
-        },
-        computerGuess(context, event, meta) {}
+        resetState: assign((ctx) => {
+          console.log(ctx)
+
+          return initialState
+        }),
+        computerGuess: assign({
+          guessedNumbers: ({
+            guessRange: { highNumber, lowNumber },
+            guessedNumbers
+          }) => {
+            const guessedNumber = Math.floor(
+              Math.random() * (highNumber - lowNumber + 1) + lowNumber
+            )
+            return [guessedNumber, ...guessedNumbers]
+          }
+        }),
+        openGameModal: assign({
+          isGameModalOpen: (context) => true
+        }),
+        updateTargetNumber: assign({
+          targetNumber: (context, event) => event.value
+        }),
+        setNewGuessRange: assign({
+          guessRange: (context, event) => {
+            const high = event?.setHigh || context.guessRange.highNumber
+            const low = event?.setLow || context.guessRange.lowNumber
+            return { highNumber: high, lowNumber: low }
+          }
+        }),
+        setWinner: assign({
+          isWinner: (ctx) => true
+        })
       },
       guards: {
-        "correct guess": () => {
-          return true
-        },
-        "incorrect guess": () => true
+        correctGuess: (context) => {
+          const isWinner = context.guessedNumbers[0] === context.targetNumber
+          return isWinner
+        }
       }
     }
   )
 
 export default function App() {
-  const [state, send] = useMachine(gameMachine)
-  const [{ targetNumber, isWinner, isModalOpen, guessedNumbers }, dispatch] =
-    useReducer(
-      (state: StateType, { type, payload }: ActionTypes): StateType => {
-        const { lowNumber, highNumber, guessedNumbers, isWinner } = state
-        switch (type) {
-          case "guessNumber":
-            const guessedNumber = Math.floor(
-              Math.random() * (highNumber - lowNumber + 1) + lowNumber
-            )
-            return {
-              ...state,
-              guessedNumbers: [guessedNumber, ...guessedNumbers]
-            }
-          case "toggleModal":
-            return { ...state, isModalOpen: payload }
-          case "setNumber":
-            return { ...state, targetNumber: payload }
-          case "setLowHigh":
-            const low = payload.low || lowNumber
-            const high = payload.high || highNumber
-            return { ...state, lowNumber: low, highNumber: high }
-          case "checkWinner":
-            if (guessedNumbers[0] === targetNumber) {
-              return { ...state, isWinner: true }
-            } else {
-              return { ...state }
-            }
-          default:
-            return state
-        }
-      },
-      initialState
-    )
-
-  const handleSubmitNumber = () => {
-    dispatch({ type: "guessNumber" })
-    dispatch({ type: "toggleModal", payload: true })
-  }
-
-  const handleNumberIsHigher = () => {
-    dispatch({ type: "setLowHigh", payload: { low: guessedNumbers[0] } })
-    dispatch({ type: "guessNumber" })
-  }
-
-  const handleNumberIsLower = () => {
-    dispatch({ type: "setLowHigh", payload: { high: guessedNumbers[0] } })
-    dispatch({ type: "guessNumber" })
-  }
+  const [{ context }, send] = useMachine(gameMachine)
 
   return (
     <View style={styles.container}>
@@ -185,31 +149,52 @@ export default function App() {
           keyboardType="numeric"
           placeholder="Enter number"
           maxLength={2}
-          value={targetNumber.toString()}
+          value={context.targetNumber.toString()}
           onChangeText={(text) => {
-            dispatch({ type: "setNumber", payload: Number(text) })
+            send({ type: "typeNumber", value: Number(text) })
           }}
         />
-        <Button title="Go" onPress={handleSubmitNumber} />
-        <Modal visible={isModalOpen} animationType="slide">
+        <Button
+          title="Go"
+          onPress={() => {
+            send("submitNumber")
+          }}
+        />
+        <Modal visible={context.isGameModalOpen} animationType="slide">
           <View>
-            <Text>My number: {targetNumber}</Text>
-            <Text>Guessed number: {guessedNumbers[0]} </Text>
+            <Text>My number: {context.targetNumber}</Text>
+            <Text>Guessed number: {context.guessedNumbers[0]} </Text>
             <Pressable
               style={styles.hiLowButtons}
               android_ripple={{ color: "#f05" }}
-              onPress={handleNumberIsHigher}
+              onPress={() => {
+                send({
+                  type: "selectHighOrLow",
+                  setLow: context.guessedNumbers[0]
+                })
+              }}
             >
               <Text style={styles.hiLowButtonsText}>Higher</Text>
             </Pressable>
-            <Button title="lower" onPress={handleNumberIsLower} />
-            {guessedNumbers.slice(1).map((guess, i) => {
-              return <Text key={i}>Guess: {guess}</Text>
-            })}
+            <Button
+              title="lower"
+              onPress={() => {
+                send({
+                  type: "selectHighOrLow",
+                  setHigh: context.guessedNumbers[0]
+                })
+              }}
+            />
           </View>
-          <Modal visible={isWinner}>
+          <Modal visible={context.isWinner}>
             <View>
               <Text>winner</Text>
+              <Button
+                title="reset"
+                onPress={() => {
+                  send("restartGame")
+                }}
+              />
             </View>
           </Modal>
         </Modal>
