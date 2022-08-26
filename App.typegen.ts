@@ -14,20 +14,18 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
-    computerGuess: "selectHigher" | "selectLower";
-    resetState: "restartGame" | "xstate.init";
+    computerGuess: "selectHighOrLow" | "submitNumber";
+    openGameModal: "submitNumber";
+    resetState: "restartGame";
+    setNewGuessRange: "selectHighOrLow";
+    setWinner: "";
+    updateTargetNumber: "typeNumber";
   };
   eventsCausingServices: {};
   eventsCausingGuards: {
-    "correct guess": "";
-    "incorrect guess": "";
+    correctGuess: "";
   };
   eventsCausingDelays: {};
-  matchesStates:
-    | "compterTurn"
-    | "gameEnd"
-    | "gameSetup"
-    | "myTurn"
-    | "selectTargetNumber";
+  matchesStates: "computerTurn" | "gameEnd" | "myTurn" | "selectTargetNumber";
   tags: never;
 }
