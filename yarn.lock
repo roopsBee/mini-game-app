@@ -3341,6 +3341,11 @@ expo-keep-awake@~10.2.0:
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-10.2.0.tgz#46f04740bccd321732bbbed93491e2076d5dbbd7"
   integrity sha512-kIRtO4Hmrvxh4E45IPWG/NiUZsuRe1AQwBT09pq+kx8nm6tUS4B9TeL6+1NFy+qVBLbGKDqoQD5Ez7XYTFtBeQ==
 
+expo-linear-gradient@~11.4.0:
+  version "11.4.0"
+  resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-11.4.0.tgz#20ecad4d11e66e35b31600e5389ec9c4067f7312"
+  integrity sha512-qtIfsLs7NOpfxYrFSJL5uLtNHIkBHQFuQ3f7++XpoJTSm4eQVFxjjkCGWiLIrkpVjKzmgp3DLuIVsadsGX21lA==
+
 expo-modules-autolinking@0.10.2:
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/expo-modules-autolinking/-/expo-modules-autolinking-0.10.2.tgz#9a6cdc0f187da4663607b719dcf400402cc5b776"
@@ -7240,7 +7245,7 @@ use-isomorphic-layout-effect@^1.0.0:
   resolved "https://registry.yarnpkg.com/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.1.2.tgz#497cefb13d863d687b08477d9e5a164ad8c1a6fb"
   integrity sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==
 
-use-sync-external-store@^1.0.0:
+use-sync-external-store@1.2.0, use-sync-external-store@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
@@ -7440,10 +7445,15 @@ xmlbuilder@~11.0.0:
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
   integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
 
-xstate@^4.29.0, xstate@^4.33.3:
+xstate@^4.29.0:
   version "4.33.3"
   resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.33.3.tgz#a1c0a60626f79e8563f5ec6c55da058bab0ed563"
   integrity sha512-NXFGDFXlDg04dYaKwAlHGeCT6K4bcYiXndaG1p9g++1z2FnEUji6chfZ2lxYc28pcV6tz1vAsfaSJdgZUS4J/w==
+
+xstate@^4.33.4:
+  version "4.33.4"
+  resolved "https://npm-registry.bauerhosting.com/xstate/-/xstate-4.33.4.tgz#ff6831b95947c5185a455f8bc4570b21f547278a"
+  integrity sha512-3giWybQ8XvAr+3tDENlGduR4XREmiUOVxKRjdqFEe6g8eD8UrYhTth3OyLHX/sR9r/9GY2t/LbjfkCC8XFfv4Q==
 
 xtend@~4.0.1:
   version "4.0.2"
@@ -7502,3 +7512,15 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zustand-middleware-xstate@^1.1.1:
+  version "1.1.1"
+  resolved "https://npm-registry.bauerhosting.com/zustand-middleware-xstate/-/zustand-middleware-xstate-1.1.1.tgz#94fff8d79430672318844a027907dc0f564fef56"
+  integrity sha512-WNKGWzWwytk5dfnIR595r0BkA9ojhxgw29MG0IQzSW/DNf4x2rrdW5paqB4Hpf6NVWO00OiEuvmqmNknHmnfdA==
+
+zustand@^4.1.1:
+  version "4.1.1"
+  resolved "https://npm-registry.bauerhosting.com/zustand/-/zustand-4.1.1.tgz#5a61cc755a002df5f041840a414ae6e9a99ee22b"
+  integrity sha512-h4F3WMqsZgvvaE0n3lThx4MM81Ls9xebjvrABNzf5+jb3/03YjNTSgZXeyrvXDArMeV9untvWXRw1tY+ntPYbA==
+  dependencies:
+    use-sync-external-store "1.2.0"
