@@ -6,7 +6,9 @@ export interface Typegen0 {
     "": { type: "" };
     "xstate.init": { type: "xstate.init" };
   };
-  invokeSrcNameMap: {};
+  invokeSrcNameMap: {
+    loadFonts: "done.invoke.gameMachine.appLoading:invocation[0]";
+  };
   missingImplementations: {
     actions: never;
     services: never;
@@ -21,11 +23,18 @@ export interface Typegen0 {
     setWinner: "";
     updateTargetNumber: "typeNumber";
   };
-  eventsCausingServices: {};
+  eventsCausingServices: {
+    loadFonts: "xstate.init";
+  };
   eventsCausingGuards: {
     correctGuess: "";
   };
   eventsCausingDelays: {};
-  matchesStates: "computerTurn" | "gameEnd" | "myTurn" | "selectTargetNumber";
+  matchesStates:
+    | "appLoading"
+    | "computerTurn"
+    | "gameEnd"
+    | "myTurn"
+    | "selectTargetNumber";
   tags: never;
 }

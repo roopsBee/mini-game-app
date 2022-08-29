@@ -7,17 +7,21 @@
     "a": "expo start --android",
     "i": "expo start --ios",
     "w": "expo start --web",
-    "x": "xstate typegen ./App.tsx --watch"
+    "x": "xstate typegen ./src/components/machines/*.ts --watch"
   },
   "dependencies": {
+    "@expo-google-fonts/fredericka-the-great": "^0.2.2",
     "@xstate/cli": "^0.3.2",
     "@xstate/react": "^3.0.1",
     "expo": "~46.0.7",
+    "expo-app-loading": "~2.1.0",
+    "expo-font": "~10.2.0",
     "expo-linear-gradient": "~11.4.0",
+    "expo-splash-screen": "~0.16.1",
     "expo-status-bar": "~1.4.0",
     "react": "18.0.0",
     "react-dom": "18.0.0",
-    "react-native": "0.69.4",
+    "react-native": "0.69.5",
     "react-native-web": "~0.18.7",
     "xstate": "^4.33.4",
     "zustand": "^4.1.1",

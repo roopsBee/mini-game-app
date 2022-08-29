@@ -1,7 +1,14 @@
 import { EndGame } from "./EndGame"
 import React from "react"
 
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native"
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  FlatList
+} from "react-native"
 import { useGameMachineStore } from "./machines/gameMachine"
 import Ionicons from "@expo/vector-icons/Ionicons"
 
@@ -52,14 +59,16 @@ export const InGame = () => {
               </Pressable>
             </View>
           </View>
-          <View>
-            {context.guessedNumbers.map((num, i) => {
-              return (
-                <View key={i}>
-                  <Text style={styles.guessText}>{num}</Text>
+          <View style={styles.flatListContainer}>
+            <FlatList
+              data={context.guessedNumbers}
+              keyExtractor={(item) => item.toString()}
+              renderItem={({ item }) => (
+                <View>
+                  <Text style={styles.guessText}>{item}</Text>
                 </View>
-              )
-            })}
+              )}
+            />
           </View>
         </View>
       </View>
@@ -105,7 +114,8 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderRadius: 8,
     padding: 20,
-    width: "100%"
+    width: "100%",
+    flex: 1
   },
   guessedNumberText: {
     fontSize: 20,
@@ -128,5 +138,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     marginVertical: 5
+  },
+  flatListContainer: {
+    flex: 1
   }
 })

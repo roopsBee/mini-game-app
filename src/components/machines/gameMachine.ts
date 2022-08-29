@@ -1,7 +1,9 @@
-import React from "react"
 import create from "zustand"
 import xstate from "zustand-middleware-xstate"
 import { assign, createMachine } from "xstate"
+import * as SplashScreen from "expo-splash-screen"
+import * as Font from "expo-font"
+import { FrederickatheGreat_400Regular } from "@expo-google-fonts/fredericka-the-great"
 
 export type StateType = {
   targetNumber: number
@@ -20,6 +22,8 @@ export type MachineEvents =
   | { type: "restartGame" }
   | { type: "selectHighOrLow"; setLow?: number; setHigh?: number }
 
+type ServiceType = { loadFonts: { data: boolean } }
+
 const initialState: StateType = {
   targetNumber: 0,
   isGameModalOpen: false,
@@ -32,15 +36,19 @@ const initialState: StateType = {
 }
 
 const gameMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0aAngCoCuATkQMSxgA2YOALgBIFR4B5OgBkA9gHdEoAA6jYBTgVFEpIAB6IAjAAYAHADZSATgDsu3doCsmowGZdmkwBYANCAqJbAJm2lNur0svJwD9J01LXVsAX2i3VAxsfGIyHFE0aRpOMDpaBkZVWXlFZVUNBE1bPVJbE1tLbTNLfT0otw8EJ31DcK8vfUdLZutbJ1j49CxcQhJSBLAAUSIIRjo4ThQ6TgBxScK5BSUVJHUtZq9SEyMh7SdWxtd3RABaO1JdM0GvE30qk0sTOMQPMkjMyCx2FwqJsYJwAHI0NAAIxyzBoSLQCgRyJy+2KRzKiCM-VIAOatm64QizXaWiuxicliMRhaVlGJi8QJB0xSpAhHE40LosOxKLojE4FGkYFFuJORUOpRO5U0fSMpC8uicfVut2sRkeHWeJlI2lsRn8uiMjW0t3qRlicRARFEEDgqm5yVmlDyxxkBxKftOCGu6t0zQtI2pFNpCG8Jv0Q004XCFLumi5k1BvLSGSyOV9eMVQZVXmJppMVzCxOTLNjVV0fmttmTNh0zjGTs9YLmkyWECLgcJFTJGqslm1LV++i8sZChitVycjK1ziumcSPNm-KhMLA8MRYsHBOViCt6u8SY+9n+TlsseeERqtlGfWCDkrRgCG6mXrAx6VUByg+SwakCaxrxAu8H00RN3i6GtYLCClakdaIgA */
+  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswFkUGMAWAlgHZgB0aAngCoCuATkQMSxgA2YOALgBIFR4B5OgBkA9gHdEoAA6jYBTgVFEpIAB6IAjACYArAAZSATgDsADgBs+0wBYdR-SYA0ICom0BmC6R0Wj2kwsvGwDdMwBfcJdUDGx8YjIcUTRpGk4wOloGRlVZeUVlVQ0ETRszE1I-II8TRyNNIxsLFzcEL29S-V1NXSNGvobI6PQsXEISUhiwAFEiCEY6OE4UOk4AcRHcuQUlFSR1LRMQn00zD3OPTSuzLpbEAFpNLsrzPt0rfX0veqGQKbjxmQWOwuFQVjBOAA5GhoABGGWYNFhaAU0LhGS2+V2RS0jgqNg8NhMBm09RCQTuCEspE+RgsRP0Zm05X0Fgsv3+YwSpGBHE4YLoELR8LojE4FGkYGFGP2eR2hX2xU6Zkqjn0NjpAQseiMlMeKrMNk+1k8jnOJg5IwB3JQ0mkYhQEGIUEYEGUZGIADdRABrMic+ITW320SO50IL2iHAoApEADa+gAupj5XtQErHCqbAYatp6WYmf49b5SLoTIE89riR5IlEQERRBA4KoA4DyNR6GmQHLYziStYKg0AgTdB5WYaPJTtEbjBYwlUjaEmpbYlyJkkUmkMlkuz3sYqtETNKQjXVSto9Hop3ZSLUgmXy3SDOWV6NA-6RrMICneweSiZSVLL4L30bRPg8XRdEpDxTB8QldFCTQYN6TRX2tCZeVBcEwChGERR-fd01xcxKjKQkTDpU4LE0PUAjgkIQjLBozQvNC1zIYMHSdIgoAIhUiP7Q1bxMK5SSMAxLGZWiDGEhCznqDxDUGOtWwSPiuwzUcT3IkkyTzSdXAeDwL1vGwjUJdVhx+WsgA */
   createMachine(
     {
       context: { ...initialState },
       tsTypes: {} as import("./gameMachine.typegen").Typegen0,
-      schema: { context: {} as StateType, events: {} as MachineEvents },
+      schema: {
+        context: {} as StateType,
+        events: {} as MachineEvents,
+        services: {} as ServiceType
+      },
       predictableActionArguments: true,
       id: "gameMachine",
-      initial: "selectTargetNumber",
+      initial: "appLoading",
       states: {
         myTurn: {
           on: {
@@ -81,14 +89,22 @@ const gameMachine =
               actions: "updateTargetNumber"
             }
           }
+        },
+        appLoading: {
+          invoke: {
+            src: "loadFonts",
+            onDone: [
+              {
+                target: "selectTargetNumber"
+              }
+            ]
+          }
         }
       }
     },
     {
       actions: {
         resetState: assign((ctx) => {
-          console.log(ctx)
-
           return initialState
         }),
         computerGuess: assign({
@@ -123,6 +139,14 @@ const gameMachine =
         correctGuess: (context) => {
           const isWinner = context.guessedNumbers[0] === context.targetNumber
           return isWinner
+        }
+      },
+      services: {
+        loadFonts: async () => {
+          await Font.loadAsync({ frederick: FrederickatheGreat_400Regular })
+          SplashScreen.hideAsync()
+
+          return true
         }
       }
     }

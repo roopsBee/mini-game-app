@@ -13,12 +13,19 @@ import { LinearGradient } from "expo-linear-gradient"
 import { StatusBar } from "expo-status-bar"
 import { InGame } from "./src/components/InGame"
 import { useGameMachineStore } from "./src/components/machines/gameMachine"
+import * as SplashScreen from "expo-splash-screen"
+
+SplashScreen.preventAutoHideAsync()
 
 export default function App() {
   const {
     send,
-    state: { context }
+    state: { context, value }
   } = useGameMachineStore()
+
+  if (value === "appLoading") {
+    return null
+  }
 
   return (
     <LinearGradient colors={["#f03", "#f0f"]} style={styles.container}>
@@ -94,11 +101,11 @@ const styles = StyleSheet.create({
   },
   enterNumberText: {
     fontSize: 20,
-    fontWeight: "600",
     borderRadius: 5,
     paddingVertical: 5,
     color: "white",
-    textTransform: "capitalize"
+    textTransform: "capitalize",
+    fontFamily: "frederick"
   },
   inputContainer: {
     paddingHorizontal: 10,
@@ -106,7 +113,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginVertical: 10,
     borderRadius: 5,
-    fontSize: 18
+    fontSize: 18,
+    fontFamily: "frederick"
   },
   inGameContainer: {
     alignItems: "center",
