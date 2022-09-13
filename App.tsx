@@ -7,7 +7,9 @@ import {
   TextInput,
   View,
   ImageBackground,
-  Alert
+  Alert,
+  useWindowDimensions,
+  KeyboardAvoidingView
 } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { StatusBar } from "expo-status-bar"
@@ -22,7 +24,8 @@ export default function App() {
     send,
     state: { context, value }
   } = useGameMachineStore()
-
+  const { height } = useWindowDimensions()
+  const padding = height < 400 ? 0 : 30
   if (value === "appLoading") {
     return null
   }
@@ -97,7 +100,10 @@ const styles = StyleSheet.create({
     shadowColor: "#00f",
     shadowRadius: 50,
     shadowOffset: { height: 4, width: 4 },
-    shadowOpacity: 0.5
+    shadowOpacity: 0.5,
+    flex: 1,
+    height: 400,
+    maxHeight: "80%"
   },
   enterNumberText: {
     fontSize: 20,
@@ -116,17 +122,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "frederick"
   },
-  inGameContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-    backgroundColor: "#05f"
-  },
   imageContainer: { flex: 1 },
   homeContainerWrapper: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    flexDirection: "row"
   },
   imageStyle: {
     opacity: 0.6

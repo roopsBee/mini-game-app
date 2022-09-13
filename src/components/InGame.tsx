@@ -1,14 +1,14 @@
-import { EndGame } from "./EndGame"
 import React from "react"
-
 import {
   Modal,
   Pressable,
   StyleSheet,
   Text,
   View,
-  FlatList
+  FlatList,
+  useWindowDimensions
 } from "react-native"
+import { EndGame } from "./EndGame"
 import { useGameMachineStore } from "./machines/gameMachine"
 import Ionicons from "@expo/vector-icons/Ionicons"
 
@@ -17,9 +17,11 @@ export const InGame = () => {
     state: { context },
     send
   } = useGameMachineStore()
+  const { height } = useWindowDimensions()
+  const padding = height < 400 ? 10 : 50
   return (
     <Modal visible={context.isGameModalOpen} animationType="slide">
-      <View style={styles.inGameContainer}>
+      <View style={[styles.inGameContainer, { paddingTop: padding }]}>
         <View style={styles.inGameChildrenContainer}>
           <Text style={styles.myNumberText}>
             My number: {context.targetNumber}
