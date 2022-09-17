@@ -9,7 +9,8 @@ import {
   ImageBackground,
   Alert,
   useWindowDimensions,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Platform
 } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { StatusBar } from "expo-status-bar"
@@ -32,42 +33,44 @@ export default function App() {
 
   return (
     <LinearGradient colors={["#f03", "#f0f"]} style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <ImageBackground
         source={require("./assets/images/home-background.jpg")}
         resizeMode={"cover"}
         style={styles.container}
         imageStyle={styles.imageStyle}
       >
-        <View style={styles.homeContainerWrapper}>
-          <View style={styles.homeContainer}>
-            <Text style={styles.enterNumberText}>
-              Enter a number between 0-99
-            </Text>
-            <TextInput
-              style={styles.inputContainer}
-              keyboardType="number-pad"
-              placeholder="Enter number"
-              maxLength={2}
-              value={context.targetNumber.toString()}
-              onChangeText={(text) => {
-                if (!isNaN(+text)) {
-                  send({ type: "typeNumber", value: Number(text) })
-                } else {
-                  Alert.alert("alert", "not a number", [
-                    { text: "I understand", style: "destructive" }
-                  ])
-                }
-              }}
-            />
-            <Button
-              title="Go"
-              onPress={() => {
-                send("submitNumber")
-              }}
-            />
+        <KeyboardAvoidingView style={styles.container} behavior="height">
+          <View style={styles.homeContainerWrapper}>
+            <View style={styles.homeContainer}>
+              <Text style={styles.enterNumberText}>
+                Enter a number between 0-99
+              </Text>
+              <TextInput
+                style={styles.inputContainer}
+                keyboardType="number-pad"
+                placeholder="Enter number"
+                maxLength={2}
+                value={context.targetNumber.toString()}
+                onChangeText={(text) => {
+                  if (!isNaN(+text)) {
+                    send({ type: "typeNumber", value: Number(text) })
+                  } else {
+                    Alert.alert("alert", "not a number", [
+                      { text: "I understand", style: "destructive" }
+                    ])
+                  }
+                }}
+              />
+              <Button
+                title="Go"
+                onPress={() => {
+                  send("submitNumber")
+                }}
+              />
+            </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
         <InGame />
       </ImageBackground>
     </LinearGradient>
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
     borderWidth: 7,
     borderRadius: 10,
     padding: 20,
-    backgroundColor: "#f50",
+    backgroundColor: Platform.select({ android: "#f50", ios: "#440" }),
     elevation: 10,
     shadowColor: "#00f",
     shadowRadius: 50,
